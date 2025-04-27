@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "npm run build && move out docs || mv out docs"
+    "export": "npm run build && move out . || mv out ."
   },
   "dependencies": {
     "@types/three": "^0.175.0",

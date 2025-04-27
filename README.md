@@ -37,21 +37,21 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Deploy on GitHub Pages
 
-1. Run the export script to generate static files:
+1. Run the export script to generate static files in root:
 ```bash
 npm run export
 ```
 
-2. Commit and push all files including the `docs/` directory
+2. Commit and push all files
 
 3. In your GitHub repository settings:
    - Go to Settings → Pages
    - Select "Deploy from a branch"
    - Choose branch: `main` (or your default branch)
-   - Select folder: `/docs`
+   - Select folder: `/ (root)`
    - Click Save
 
 4. Your site will be available at:
-   `https://[your-username].github.io/[repository-name]/`
+   `https://[your-username].github.io/`
 
-Note: For custom domains, update `basePath` in next.config.js
+Note: For repository-name.github.io sites, ensure your repository is named `[username].github.io`
