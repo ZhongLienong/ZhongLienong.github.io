@@ -1,15 +1,12 @@
 /** @type {import('next').NextConfig} */
-const repoName = 'ZhongLienong.github.io';
-
 const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: ['beeneverywhere.net'],
-    unoptimized: true,
   },
-  basePath: `/${repoName}`,
-  assetPrefix: `/${repoName}/`,
+  basePath: '',
+  assetPrefix: '',
   output: 'export',
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
