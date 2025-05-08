@@ -30,7 +30,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/about/places": {
+    "/about/albums": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -43,8 +43,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/about/places",
-      "dataRoute": "/about/places.rsc",
+      "srcRoute": "/about/albums",
+      "dataRoute": "/about/albums.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -78,6 +78,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/about/places": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/about/places",
+      "dataRoute": "/about/places.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/about": {
       "experimentalBypassFor": [
         {
@@ -101,37 +125,13 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
-    },
-    "/about/albums": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/about/albums",
-      "dataRoute": "/about/albums.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "d8fadbd18489249410e3e9dabe5a050d",
-    "previewModeSigningKey": "39dbffde25ef819c55b97ae1740131b5363bf14d3a623e55a06947f84e14cdd2",
-    "previewModeEncryptionKey": "24b204746edfddd0fc831117c3031d93c52870e5a09abc375e316722677db37e"
+    "previewModeId": "1c54ec3a0126cdcceac0b32e0ce5aedd",
+    "previewModeSigningKey": "d224e650425c520bde776d033bea43bb3aa133eec8db854c0dfa5d4b8b4b133c",
+    "previewModeEncryptionKey": "42f8ce52a24eccf994bd20dd4affc243704964d6cf24479217cf0979f4239180"
   }
 }
