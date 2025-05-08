@@ -29,8 +29,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Copy static files
+        run: cp -r ./.next/server/pages/* ./
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./.next
+          publish_dir: ./
