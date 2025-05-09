@@ -1,30 +1,6 @@
 {
   "version": 4,
   "routes": {
-    "/about/albums": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/about/albums",
-      "dataRoute": "/about/albums.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/about": {
       "experimentalBypassFor": [
         {
@@ -97,6 +73,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/about/albums": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/about/albums",
+      "dataRoute": "/about/albums.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/favicon.ico": {
       "initialHeaders": {
         "cache-control": "public, max-age=0, must-revalidate",
@@ -130,8 +130,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "5215a8fd0c9468d60e76edf951f3222d",
-    "previewModeSigningKey": "47623964ab7ade312af1b76c744cc32de388e04a6db0623952b790486c39ce8f",
-    "previewModeEncryptionKey": "4c0eaa2cafc4d8d13a7fbc1b261fb2b3c1763f7c5430e449d9dbeb343830626e"
+    "previewModeId": "6885ce82e5a9e449a1a92ebc094a6d79",
+    "previewModeSigningKey": "27c92200bb155089d3e279432726a6a0fb0a572c82568a6247d534e111ec2077",
+    "previewModeEncryptionKey": "6038de5d70d3fc46408e52dbd83c569d473a67a8091d1e057c4f4d541ce31fae"
   }
 }
