@@ -6,6 +6,7 @@ const nextConfig = {
   },
   basePath: '',
   assetPrefix: '',
+  output: 'export',
   distDir: 'out',
 }
 
