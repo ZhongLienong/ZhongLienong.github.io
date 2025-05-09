@@ -1,20 +1,4 @@
-'use client'
-
-import { useState, useEffect } from 'react';
-
 export default function Home() {
-  const [visitors, setVisitors] = useState(0);
-
-  useEffect(() => {
-    const fetchVisitors = async () => {
-      const response = await fetch('/api/visitors');
-      const data = await response.json();
-      setVisitors(data.visitors);
-    };
-
-    fetchVisitors();
-  }, []);
-
   return (
     <div>
       {/* Welcome Section */}
@@ -23,7 +7,6 @@ export default function Home() {
         <div>
           <p>Hello and welcome to my personal website!</p>
           <p>I'm a developer specializing in Unreal Engine and C++.</p>
-          <p>Visitor Count: {visitors}</p>
         </div>
       </div>
 
