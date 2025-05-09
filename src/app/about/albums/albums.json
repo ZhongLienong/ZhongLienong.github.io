@@ -51,7 +51,7 @@
   {
     "id": "9",
     "title": "Live at the Fillmore",
-    "tags": ["Tom Petty", "1990s", "Live"],
+    "tags": ["Tom Petty and the Heartbreakers", "1990s", "Live"],
     "spotifyId": "1XtnMkxeV9wdELLvBZxktL"
   },
   {
@@ -72,5 +72,35 @@
     "title": "教育",
     "tags": ["東京事変", "2000s", "Studio"],
     "spotifyId": "0WhNxc2V5kYKaPevYHVT5v"
+  },
+  {
+    "id": "13",
+    "title": "Atom Heart Mother",
+    "tags": ["Pink Floyd", "1970s", "Studio"],
+    "spotifyId": "2cUpAOlQjV5uSjkWj5bEQY"
+  },
+  {
+    "id": "14",
+    "title": "Wish You Were Here",
+    "tags": ["Pink Floyd", "1970s", "Studio"],
+    "spotifyId": "0bCAjiUamIFqKJsekOYuRw"
+  },
+  {
+    "id": "15",
+    "title": "Animals",
+    "tags": ["Pink Floyd", "1970s", "Studio"],
+    "spotifyId": "3b4E89rxzZQ9zkhgKpj8N4"
+  },
+  {
+    "id": "16",
+    "title": "Knebworth 1996",
+    "tags": ["Oasis", "1990s", "Live"],
+    "spotifyId": "5TC9oSol9ZQwXQk8XcsD7i"
+  },
+  {
+    "id": "17",
+    "title": "In The Court Of The Crimson King",
+    "tags": ["King Crimson", "1960s", "Studio"],
+    "spotifyId": "75ol9OP8bJaRqzGimpFHDm"
   }
 ]

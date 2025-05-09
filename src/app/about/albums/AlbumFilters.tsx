@@ -111,15 +111,15 @@ export default function AlbumFilters({ albums, onFilterChange }: AlbumFiltersPro
               scrollbarWidth: 'thin',
               scrollbarColor: '#6a4a8c #333',
               // @ts-ignore - Custom scrollbar properties
-              '::-webkit-scrollbar': {
+              '::WebkitScrollbar': {
                 width: '8px'
               },
               // @ts-ignore - Custom scrollbar properties
-              '::-webkit-scrollbar-track': {
+              '::WebkitScrollbar-track': {
                 background: '#333'
               },
               // @ts-ignore - Custom scrollbar properties
-              '::-webkit-scrollbar-thumb': {
+              '::WebkitScrollbar-thumb': {
                 backgroundColor: '#6a4a8c',
                 borderRadius: '4px'
               }

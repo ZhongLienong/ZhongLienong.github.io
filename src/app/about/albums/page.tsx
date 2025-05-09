@@ -1,16 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import AlbumFilters from './AlbumFilters'
 import type { Album } from './types'
 import LazySpotifyPlayer from './LazySpotifyPlayer'
 import albumsData from './albums.json'
+
+const VISIBLE_ALBUMS = 10 // Number of albums to render at once
 
 export default function Albums() {
   const [filterTags, setFilterTags] = useState<string[]>([])
   const [albums, setAlbums] = useState<Album[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: VISIBLE_ALBUMS * 2 }) // Double buffer
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const loadAlbums = async () => {
@@ -25,6 +29,29 @@ export default function Albums() {
     }
 
     loadAlbums()
+
+    const handleScroll = () => {
+      if (!gridRef.current) return
+      
+      const { scrollTop, clientHeight, scrollHeight } = gridRef.current
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight
+      
+      const buffer = VISIBLE_ALBUMS
+      const newStart = Math.max(0, Math.floor(scrollTop / 300) - buffer)
+      const newEnd = Math.min(
+        albumsData.length,
+        newStart + VISIBLE_ALBUMS * 3 // Render 3x visible albums (1x above, 1x visible, 1x below)
+      )
+      
+      setVisibleRange({
+        start: newStart,
+        end: newEnd
+      })
+    }
+
+    const grid = gridRef.current
+    grid?.addEventListener('scroll', handleScroll)
+    return () => grid?.removeEventListener('scroll', handleScroll)
   }, [])
 
   const filteredAlbums = filterTags.length === 0
@@ -52,7 +79,7 @@ export default function Albums() {
           </>
         )}
         
-        <div style={{
+        <div ref={gridRef} style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
@@ -61,7 +88,7 @@ export default function Albums() {
           overflowY: 'auto',
           paddingRight: '10px'
         }}>
-          {filteredAlbums.map(album => (
+          {filteredAlbums.slice(visibleRange.start, visibleRange.end).map(album => (
             <div key={album.id} style={{
               backgroundColor: '#1a1a1a',
               borderRadius: '8px',
@@ -120,7 +147,7 @@ export default function Albums() {
                   </span>
                 )}
               </h3>
-              <div style={{ 
+        <div style={{
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: '8px',
