@@ -23,6 +23,7 @@ export default function Home() {
         <div>
           <p>Hello and welcome to my personal website!</p>
           <p>I'm a developer specializing in Unreal Engine and C++.</p>
+          <p>Visitor Count: {visitors}</p>
         </div>
       </div>
 
@@ -42,11 +43,6 @@ export default function Home() {
             </ul>
           </div>
         </div>
-      </div>
-
-      {/* Visitor Count Section */}
-      <div className="section">
-        <h2>Visitor Count: {visitors}</h2>
       </div>
     </div>
   );
