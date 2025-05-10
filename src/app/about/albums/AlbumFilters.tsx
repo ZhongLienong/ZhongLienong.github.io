@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import type { Album } from './types'
 
 interface AlbumFiltersProps {
@@ -8,37 +8,45 @@ interface AlbumFiltersProps {
   onFilterChange: (tags: string[]) => void
 }
 
-export default function AlbumFilters({ albums, onFilterChange }: AlbumFiltersProps) {
+interface Tag {
+  name: string
+  type: 'artist' | 'decade' | 'type'
+}
+
+// Using memo to prevent unnecessary re-renders
+function AlbumFiltersComponent({ albums, onFilterChange }: AlbumFiltersProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
 
-  interface Tag {
-    name: string
-    type: 'artist' | 'decade' | 'type'
-  }
+  // Memoize tag extraction and categorization
+  const { allTags, tagCategories } = useMemo(() => {
+    // Extract and categorize tags
+    const extractedTags: Tag[] = albums.flatMap(album => 
+      album.tags.map((tag: string) => {
+        if (['Live', 'Studio'].includes(tag)) {
+          return { name: tag, type: 'type' }
+        } else if (tag.endsWith('s') && tag.length === 5 && !isNaN(Number(tag.slice(0,4)))) {
+          return { name: tag, type: 'decade' }
+        } else {
+          return { name: tag, type: 'artist' }
+        }
+      })
+    );
 
-  // Extract and categorize tags
-  const allTags: Tag[] = albums.flatMap(album => 
-    album.tags.map((tag: string) => {
-      if (['Live', 'Studio'].includes(tag)) {
-        return { name: tag, type: 'type' }
-      } else if (tag.endsWith('s') && tag.length === 5 && !isNaN(Number(tag.slice(0,4)))) {
-        return { name: tag, type: 'decade' }
-      } else {
-        return { name: tag, type: 'artist' }
-      }
-    })
-  )
+    // Create categories
+    const categories = {
+      'Artist': [...new Set(extractedTags.filter(t => t.type === 'artist').map(t => t.name))]
+        .sort((a, b) => a.localeCompare(b)),
+      'Decade': [...new Set(extractedTags.filter(t => t.type === 'decade').map(t => t.name))]
+        .sort((a, b) => a.localeCompare(b)),
+      'Type': [...new Set(extractedTags.filter(t => t.type === 'type').map(t => t.name))]
+    };
 
-  const tagCategories = {
-    'Artist': [...new Set(allTags.filter(t => t.type === 'artist').map(t => t.name))]
-      .sort((a, b) => a.localeCompare(b)),
-    'Decade': [...new Set(allTags.filter(t => t.type === 'decade').map(t => t.name))]
-      .sort((a, b) => a.localeCompare(b)),
-    'Type': [...new Set(allTags.filter(t => t.type === 'type').map(t => t.name))]
-  }
+    return { allTags: extractedTags, tagCategories: categories };
+  }, [albums]);
 
-  const toggleTag = (tag: string, tagType: 'artist' | 'decade' | 'type') => {
+  // Memoize toggle tag function
+  const toggleTag = useCallback((tag: string, tagType: 'artist' | 'decade' | 'type') => {
     // Get the tag object to determine its type
     const tagObj = allTags.find(t => t.name === tag)
     if (!tagObj) return
@@ -59,11 +67,12 @@ export default function AlbumFilters({ albums, onFilterChange }: AlbumFiltersPro
     setSelectedTags(newTags)
     onFilterChange(newTags)
     setActiveDropdown(null)
-  }
+  }, [allTags, selectedTags, onFilterChange]);
 
-  const toggleDropdown = (category: string) => {
+  // Memoize toggle dropdown function
+  const toggleDropdown = useCallback((category: string) => {
     setActiveDropdown(activeDropdown === category ? null : category)
-  }
+  }, [activeDropdown]);
 
   return (
     <div style={{
@@ -107,22 +116,11 @@ export default function AlbumFilters({ albums, onFilterChange }: AlbumFiltersPro
               minWidth: '150px',
               maxHeight: '300px',
               overflowY: 'auto',
+              overflowX: 'hidden',
               boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+              // Standard scrollbar styling that works across browsers
               scrollbarWidth: 'thin',
-              scrollbarColor: '#6a4a8c #333',
-              // @ts-ignore - Custom scrollbar properties
-              '::WebkitScrollbar': {
-                width: '8px'
-              },
-              // @ts-ignore - Custom scrollbar properties
-              '::WebkitScrollbar-track': {
-                background: '#333'
-              },
-              // @ts-ignore - Custom scrollbar properties
-              '::WebkitScrollbar-thumb': {
-                backgroundColor: '#6a4a8c',
-                borderRadius: '4px'
-              }
+              scrollbarColor: '#6a4a8c #333'
             }}>
               {tags.map(tag => (
                 <div
@@ -150,3 +148,7 @@ export default function AlbumFilters({ albums, onFilterChange }: AlbumFiltersPro
     </div>
   )
 }
+
+// Export a memoized version of the component
+const AlbumFilters = memo(AlbumFiltersComponent);
+export default AlbumFilters;

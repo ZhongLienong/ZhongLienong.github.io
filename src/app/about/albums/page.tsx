@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import AlbumFilters from './AlbumFilters'
 import type { Album } from './types'
-import LazySpotifyPlayer from './LazySpotifyPlayer'
+import AlbumCard from './AlbumCard'
 import albumsData from './albums.json'
 
-const VISIBLE_ALBUMS = 10 // Number of albums to render at once
+const VISIBLE_ALBUMS = 4 // Number of albums to render at once (2 rows with 2 albums each)
+const ALBUM_HEIGHT = 450 // Approximate height of an album card in pixels
+const BUFFER_SIZE = 2 // Number of albums to buffer above and below the visible area
 
 export default function Albums() {
   const [filterTags, setFilterTags] = useState<string[]>([])
@@ -15,50 +17,85 @@ export default function Albums() {
   const [error, setError] = useState<string | null>(null)
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: VISIBLE_ALBUMS * 2 }) // Double buffer
   const gridRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Load albums only once on component mount
   useEffect(() => {
-    const loadAlbums = async () => {
-      try {
-        setAlbums(albumsData)
-      } catch (err) {
-        setError(`Failed to load albums: ${err instanceof Error ? err.message : String(err)}`)
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
+    setAlbums(albumsData)
+    setLoading(false)
+  }, [])
+
+  // Memoize filtered albums to prevent unnecessary recalculations
+  const filteredAlbums = useMemo(() => {
+    return filterTags.length === 0
+      ? albums
+      : albums.filter(album =>
+        filterTags.every(tag => album.tags.includes(tag)));
+  }, [albums, filterTags]);
+
+  // Determine if we should use virtualization
+  const useVirtualization = useMemo(() => {
+    // Only use virtualization when there are more than 8 albums to display
+    // AND when filters are applied - show all albums when no filters are selected
+    return filterTags.length > 0 && filteredAlbums.length > 8;
+  }, [filteredAlbums.length, filterTags.length]);
+
+  // Debounced scroll handler to improve performance
+  const handleScroll = useCallback(() => {
+    if (!gridRef.current) return;
+
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
 
-    loadAlbums()
+    scrollTimeoutRef.current = setTimeout(() => {
+      const { scrollTop, clientHeight } = gridRef.current!;
 
-    const handleScroll = () => {
-      if (!gridRef.current) return
-      
-      const { scrollTop, clientHeight, scrollHeight } = gridRef.current
-      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight
-      
-      const buffer = VISIBLE_ALBUMS
-      const newStart = Math.max(0, Math.floor(scrollTop / 300) - buffer)
+      // Calculate how many albums can fit in the viewport
+      const visibleCount = Math.ceil(clientHeight / ALBUM_HEIGHT);
+
+      // Calculate which albums should be visible based on scroll position
+      const estimatedRowHeight = ALBUM_HEIGHT;
+      const rowsAbove = Math.floor(scrollTop / estimatedRowHeight);
+
+      // Calculate start and end indices with buffer
+      const newStart = Math.max(0, rowsAbove - BUFFER_SIZE);
       const newEnd = Math.min(
-        albumsData.length,
-        newStart + VISIBLE_ALBUMS * 3 // Render 3x visible albums (1x above, 1x visible, 1x below)
-      )
-      
+        filteredAlbums.length,
+        rowsAbove + visibleCount + BUFFER_SIZE
+      );
+
       setVisibleRange({
         start: newStart,
         end: newEnd
-      })
+      });
+    }, 50); // 50ms debounce
+  }, [filteredAlbums.length]);
+
+  // Set up scroll listener
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (grid) {
+      grid.addEventListener('scroll', handleScroll);
+      // Initial calculation
+      handleScroll();
     }
 
-    const grid = gridRef.current
-    grid?.addEventListener('scroll', handleScroll)
-    return () => grid?.removeEventListener('scroll', handleScroll)
-  }, [])
+    return () => {
+      if (grid) {
+        grid.removeEventListener('scroll', handleScroll);
+      }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [handleScroll]);
 
-  const filteredAlbums = filterTags.length === 0
-    ? albums
-    : albums.filter(album => 
-        filterTags.every(tag => album.tags.includes(tag)))
-  
+  // Recalculate visible range when filtered albums change
+  useEffect(() => {
+    handleScroll();
+  }, [filterTags, handleScroll]);
+
   return (
     <div className="section">
       <h2 className="bg-purple">Now this is a CD wall</h2>
@@ -70,7 +107,7 @@ export default function Albums() {
         ) : (
           <>
             <AlbumFilters albums={albums} onFilterChange={setFilterTags} />
-            
+
             {filteredAlbums.length === 0 && (
               <div style={{ marginTop: '20px', color: '#ccc' }}>
                 No albums match the selected filters
@@ -78,95 +115,32 @@ export default function Albums() {
             )}
           </>
         )}
-        
+
         <div ref={gridRef} style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
           marginTop: '20px',
-          maxHeight: '1100px',
+          // When no filters are applied, remove the max height constraint to show all albums
+          // Otherwise, maintain the virtualized scrolling behavior
+          maxHeight: filterTags.length === 0 ? 'none' : '1100px',
           overflowY: 'auto',
-          paddingRight: '10px'
+          overflowX: 'hidden',
+          paddingRight: '16px', // Increased padding to accommodate scrollbar
+          // Standard scrollbar styling that works across browsers
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#6a4a8c #222',
+          // Force scrollbar to be visible with a minimum height when filters are applied
+          minHeight: filterTags.length === 0 ? 'auto' : '500px'
         }}>
-          {filteredAlbums.slice(visibleRange.start, visibleRange.end).map(album => (
-            <div key={album.id} style={{
-              backgroundColor: '#1a1a1a',
-              borderRadius: '8px',
-              padding: '15px',
-              color: 'white'
-            }}>
-              <h3 
-                style={{ 
-                  marginBottom: '15px',
-                  position: 'relative',
-                  display: 'inline-block',
-                  cursor: album.comment ? 'help' : 'default'
-                }}
-                onMouseEnter={e => {
-                  if (album.comment) {
-                    const tooltip = e.currentTarget.querySelector('span')
-                    if (tooltip) {
-                      tooltip.style.visibility = 'visible'
-                      tooltip.style.opacity = '1'
-                      tooltip.style.top = '100%'
-                      tooltip.style.bottom = 'auto'
-                      tooltip.style.marginTop = '5px'
-                    }
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (album.comment) {
-                    const tooltip = e.currentTarget.querySelector('span')
-                    if (tooltip) {
-                      tooltip.style.visibility = 'hidden'
-                      tooltip.style.opacity = '0'
-                    }
-                  }
-                }}
-              >
-                {album.title}
-                {album.comment && (
-                  <span style={{
-                    visibility: 'hidden',
-                    opacity: 0,
-                    width: '200px',
-                    backgroundColor: '#333',
-                    color: '#fff',
-                    textAlign: 'center',
-                    borderRadius: '6px',
-                    padding: '8px',
-                    position: 'absolute',
-                    zIndex: 1000,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    transition: 'all 0.3s ease',
-                    fontStyle: 'normal',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
-                  }}>
-                    {album.comment}
-                  </span>
-                )}
-              </h3>
-        <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '8px',
-                marginBottom: '15px'
-              }}>
-                {album.tags.map(tag => (
-                  <span key={tag} style={{
-                    backgroundColor: '#6a4a8c',
-                    padding: '4px 8px',
-                    borderRadius: '12px',
-                    fontSize: '12px'
-                  }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <LazySpotifyPlayer spotifyId={album.spotifyId} />
-            </div>
-          ))}
+          {useVirtualization
+            ? filteredAlbums.slice(visibleRange.start, visibleRange.end).map(album => (
+              <AlbumCard key={album.id} album={album} />
+            ))
+            : filteredAlbums.map(album => (
+              <AlbumCard key={album.id} album={album} />
+            ))
+          }
         </div>
       </div>
     </div>
