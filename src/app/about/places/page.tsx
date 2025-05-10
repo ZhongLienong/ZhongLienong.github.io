@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import GlobeComponent from './GlobeComponent';
 
 export default function Places() {
   return (
@@ -10,20 +10,8 @@ export default function Places() {
         alignItems: 'center',
         padding: '20px 0'
       }}>
-        <Image
-          src="https://beeneverywhere.net/staticmap/7503.png"
-          alt="Map of visited places"
-          width={800}
-          height={500}
-          style={{ 
-            maxWidth: '100%', 
-            height: 'auto',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-          }}
-        />
+        <GlobeComponent />
       </div>
-
     </div>
   );
 }
