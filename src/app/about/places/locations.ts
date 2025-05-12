@@ -93,4 +93,5 @@ export const locations: Location[] = [
     { name: 'Anqing', lat: 30.5429, lng: 117.0635 },
     { name: 'Shenyang', lat: 41.8048, lng: 123.433 },
     { name: 'Dandong', lat: 39.9998, lng: 124.356 },
+    { name: 'Tianjin', lat: 39.0851, lng: 117.1994 },
 ];
