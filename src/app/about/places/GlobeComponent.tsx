@@ -210,43 +210,7 @@ export default function GlobeComponent() {
 
     // Add click handler
     function onClick(event: MouseEvent) {
-      // Get mouse position relative to the container
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(markers);
-
-      if (intersects.length > 0) {
-        const marker = intersects[0].object as THREE.Mesh;
-        const position = marker.userData.basePosition.clone();
-
-        // Animate camera to look at the marker
-        const targetPosition = position.clone().multiplyScalar(1.5);
-        const duration = 1000; // ms
-        const startPosition = camera.position.clone();
-        const startTime = Date.now();
-
-        function animateCamera() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-
-          // Ease in-out function
-          const t = progress < 0.5
-            ? 2 * progress * progress
-            : -1 + (4 - 2 * progress) * progress;
-
-          camera.position.lerpVectors(startPosition, targetPosition, t);
-          controls.target.lerpVectors(new THREE.Vector3(0, 0, 0), position, t);
-
-          if (progress < 1) {
-            requestAnimationFrame(animateCamera);
-          }
-        }
-
-        animateCamera();
-      }
+      // Do nothing on marker click
     }
 
     renderer.domElement.addEventListener('click', onClick);
