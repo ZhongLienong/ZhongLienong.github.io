@@ -13,6 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossOrigin="anonymous"/>
+      </head>
       <body>
         {/* Hit Counter */}
         <div className="hit-counter">
@@ -27,14 +31,23 @@ export default function RootLayout({
         </div>
 
         <header>
-          <pre className="ascii-art">
-            <strong>{`
-    ____  ____  ____  ____  ____  ____  ____  ____  ____  ____  ____ 
-   ||Z ||||H ||||U ||||  ||||H ||||A ||||N ||||  ||||W ||||E ||||N ||
-   ||__||||__||||__||||__||||__||||__||||__||||__||||__||||__||||__||
-   |/__\\||/__\\||/__\\||/__\\||/__\\||/__\\||/__\\||/__\\||/__\\||/__\\||/__\\|
-    `}</strong>
-          </pre>
+          <div className="ascii-art">
+            <pre className="desktop-only">
+              <strong>{`
+  ███████╗██╗  ██╗██╗   ██╗     ██╗  ██╗ █████╗ ███╗   ██╗     ██╗ ██╗ ██╗ ██████╗ ███╗   ██╗
+  ╚══███╔╝██║  ██║██║   ██║     ██║  ██║██╔══██╗████╗  ██║     ██║ ██║ ██║ █║      ████╗  ██║ 
+    ███╔╝ ███████║██║   ██║     ███████║███████║██╔██╗ ██║     ██║ ██║ ██║ ██████╗ ██╔██╗ ██║ 
+   ███╔╝  ██╔══██║██║   ██║     ██╔══██║██╔══██║██║╚██╗██║     ██║ ██║ ██║ █║      ██║╚██╗██║   
+  ███████╗██║  ██║╚██████╔╝     ██║  ██║██║  ██║██║ ╚████║       ██████    ██████╗ ██║ ╚████║   
+  ╚══════╝╚═╝  ╚═╝ ╚═════╝      ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝       ╚════╝    ╚═════╝ ╚═╝  ╚═══╝   
+`}</strong>
+            </pre>
+            <pre className="mobile-only">
+              <strong>{`
+  ZHU HAN WEN
+  -----------`}</strong>
+            </pre>
+          </div>
           <nav>
             <ul className="nav-menu">
               <li><a href="/">🏠 Home</a></li>

@@ -7,7 +7,7 @@ body {
   font-family: "Courier New", monospace;
   line-height: 1.4;
   margin: 0;
-  padding: 10px;
+  padding: 5px; /* Reduced from 10px */
   background-color: #000000;
   color: #00FF00;
   max-width: 1600px;
@@ -294,18 +294,52 @@ pre {
   box-sizing: border-box;
 }
 
-/* Classic 80's/90's ASCII art container with better spacing */
+/* Responsive ASCII art container */
 .ascii-art {
   font-family: "Courier New", monospace;
-  white-space: pre;
   text-align: center;
   color: #00FF00;
-  margin: 30px 0;
-  padding: 20px;
+  margin: 0.5vh 0;
+  padding: 0.5% 2%;
   background-color: #000000;
   border: 3px solid #00FF00;
-  font-size: 14px;
-  line-height: 1.2;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.ascii-art pre {
+  display: inline-block;
+  font-size: clamp(8px, 1.5vw, 14px);
+  line-height: 1.1;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+/* Mobile-friendly ASCII art */
+@media (max-width: 768px) {
+  .ascii-art pre {
+    font-size: clamp(6px, 2.5vw, 10px);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  
+  /* Simplified mobile version */
+  .ascii-art .mobile-only {
+    display: block;
+  }
+  .ascii-art .desktop-only {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .ascii-art .mobile-only {
+    display: none;
+  }
+  .ascii-art .desktop-only {
+    display: block;
+  }
 }
 
 /* Grid layout for better horizontal space usage */
@@ -421,7 +455,7 @@ pre {
 .nav-menu {
   list-style: none;
   padding: 0;
-  margin: 20px 0;
+  margin: 10px 0; /* Reduced from 20px */
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -514,4 +548,197 @@ pre {
 .locations-list li {
   margin-bottom: 10px;
   color: #00FF00;
+}
+
+/* Blog Specific Styles - Enhanced for Eye Comfort and Wider Layout */
+  .blog-content {
+    font-family: "Courier New", monospace;
+    color: #CCFFCC; /* Softer green for better readability */
+    line-height: 1.8; /* Increased line height */
+    padding: 30px; /* More padding */
+    background-color: #001100; /* Very dark green background instead of pure black */
+    border: 2px solid #00FF00;
+    border-radius: 5px; /* Slightly rounded corners */
+    max-width: 95%; /* Use most of the screen width */
+    margin: 0 auto; /* Center content */
+    font-size: 17px; /* Slightly larger font */
+    letter-spacing: 0.3px; /* Slightly increased letter spacing */
+  }
+
+  /* Ensure single column layout for all screen sizes */
+  @media (min-width: 1200px) {
+    .blog-content {
+      padding: 30px; /* Maintain padding */
+    }
+  }
+
+/* Single column layout for smaller screens */
+@media (max-width: 1199px) {
+  .blog-content {
+    max-width: 95%;
+    width: auto;
+    padding: 25px;
+  }
+}
+
+.blog-content h1, 
+.blog-content h2, 
+.blog-content h3, 
+.blog-content h4, 
+.blog-content h5, 
+.blog-content h6 {
+  color: #00FF00; /* Keep headings bright green for contrast */
+  border-bottom: 1px solid #00FF00;
+  padding-bottom: 10px;
+  margin-top: 40px; /* More space before headings */
+  margin-bottom: 20px; /* More space after headings */
+  line-height: 1.4;
+  letter-spacing: 0.5px; /* Better letter spacing for headings */
+}
+
+.blog-content h1 {
+  font-size: 32px;
+  text-align: center;
+}
+
+.blog-content h2 {
+  font-size: 26px;
+}
+
+.blog-content h3 {
+  font-size: 22px;
+}
+
+.blog-content p {
+  margin: 20px 0; /* More space between paragraphs */
+  color: #CCFFCC; /* Softer green */
+  line-height: 1.8;
+}
+
+.blog-content a {
+  color: #00FFFF; /* Cyan for links */
+  text-decoration: underline;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: color 0.2s; /* Smooth transition for hover effect */
+}
+
+.blog-content a:hover {
+  color: #FFFF00; /* Yellow on hover */
+  background: none;
+  border: none;
+}
+
+.blog-content img {
+  max-width: 100%;
+  border: 2px solid #00FF00;
+  margin: 30px 0; /* More space around images */
+  border-radius: 5px; /* Slightly rounded corners */
+}
+
+.blog-content pre {
+  background-color: #001a1a; /* Dark teal background for code blocks */
+  border: 2px solid #00FF00;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 25px 0;
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Slightly larger code font */
+}
+
+.blog-content code {
+  background-color: #001a1a; /* Dark teal background */
+  color: #FFFF99; /* Light yellow for code */
+  padding: 3px 5px;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+  font-size: 16px; /* Slightly larger inline code */
+}
+
+.blog-content blockquote {
+  border-left: 4px solid #00FF00;
+  padding: 15px 25px; /* More padding */
+  margin: 25px 0;
+  background-color: rgba(0, 255, 0, 0.05); /* Very subtle green background */
+  border-radius: 0 5px 5px 0; /* Rounded on right side */
+  font-style: italic;
+}
+
+.blog-content ul, .blog-content ol {
+  margin: 25px 0 25px 30px;
+  padding-left: 10px;
+}
+
+.blog-content li {
+  margin-bottom: 15px; /* More space between list items */
+  color: #CCFFCC; /* Softer green */
+}
+
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 30px 0;
+  border-radius: 5px;
+  overflow: hidden; /* For rounded corners on table */
+}
+
+.blog-content th, .blog-content td {
+  border: 1px solid #00FF00;
+  padding: 12px 15px; /* More padding in table cells */
+  text-align: left;
+}
+
+.blog-content th {
+  background-color: #001a1a; /* Dark teal background */
+  color: #FFFFFF; /* White text for headers */
+}
+
+.blog-content tr:nth-child(even) {
+  background-color: rgba(0, 255, 0, 0.03); /* Very subtle alternating row color */
+}
+
+/* Tag and Series Styles */
+.tag-badge {
+  display: inline-block;
+  background-color: #000080;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  margin: 2px;
+  font-size: 12px;
+  border: 1px solid #00FF00;
+  border-radius: 3px; /* Rounded corners */
+  transition: background-color 0.2s; /* Smooth transition */
+}
+
+.tag-badge:hover {
+  background-color: #0000a0; /* Slightly lighter blue on hover */
+}
+
+.series-badge {
+  display: inline-block;
+  background-color: #800080;
+  color: #FFFFFF;
+  padding: 3px 8px;
+  margin: 2px;
+  font-size: 12px;
+  border: 1px solid #00FF00;
+  border-radius: 3px; /* Rounded corners */
+  transition: background-color 0.2s; /* Smooth transition */
+}
+
+.series-badge:hover {
+  background-color: #a000a0; /* Slightly lighter purple on hover */
+}
+
+.current-badge {
+  display: inline-block;
+  background-color: #FFFF00;
+  color: #000000;
+  padding: 3px 8px;
+  margin: 2px;
+  font-size: 12px;
+  border: 1px solid #00FF00;
+  border-radius: 3px; /* Rounded corners */
+  font-weight: bold;
 }

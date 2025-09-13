@@ -1,11 +1,25 @@
 'use client'
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { locations } from './locations';
 
+interface ModalData {
+  name: string;
+  pictureUrl: string;
+}
+
 export default function GlobeComponent() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const [modalData, setModalData] = useState<ModalData | null>(null);
+  const labelRef = useRef<HTMLDivElement | null>(null);
+
+  // Hide tooltip when modal opens
+  useEffect(() => {
+    if (modalData && labelRef.current) {
+      labelRef.current.style.display = 'none';
+    }
+  }, [modalData]);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -55,6 +69,7 @@ export default function GlobeComponent() {
     label.style.display = 'none';
     label.style.pointerEvents = 'none'; // Ensure it doesn't interfere with mouse events
     label.style.zIndex = '1000'; // Ensure it appears above the canvas
+    labelRef.current = label; // Store reference
     mountRef.current.appendChild(label);
 
     const raycaster = new THREE.Raycaster();
@@ -73,7 +88,7 @@ export default function GlobeComponent() {
 
     // Markers
     const markers: THREE.Mesh[] = [];
-    const markerData: { position: THREE.Vector3, name: string }[] = [];
+    const markerData: { position: THREE.Vector3, name: string, hasPicture: boolean, pictureUrl?: string }[] = [];
 
     locations.forEach(loc => {
       // Convert lat/lng to 3D position
@@ -90,14 +105,19 @@ export default function GlobeComponent() {
       const position = new THREE.Vector3(x, y, z);
       markerData.push({
         position: position,
-        name: loc.name
+        name: loc.name,
+        hasPicture: loc.hasPicture || false,
+        pictureUrl: loc.pictureUrl
       });
+
+      // Choose color based on whether location has a picture
+      const markerColor = loc.hasPicture ? 0x0066ff : 0xff0000; // Blue for pictures, red for no pictures
 
       // Initial marker creation with minimum size
       const marker = new THREE.Mesh(
         markerGeometryLOD.low,
         new THREE.MeshBasicMaterial({
-          color: 0xff0000,
+          color: markerColor,
           transparent: true,
           opacity: 0.9
         })
@@ -111,7 +131,13 @@ export default function GlobeComponent() {
         position.z * elevationFactor
       );
 
-      marker.userData = { name: loc.name, basePosition: position.clone() };
+      marker.userData = { 
+        name: loc.name, 
+        basePosition: position.clone(),
+        hasPicture: loc.hasPicture || false,
+        pictureUrl: loc.pictureUrl,
+        originalColor: markerColor
+      };
       marker.scale.set(minMarkerSize, minMarkerSize, minMarkerSize);
 
       markersGroup.add(marker);
@@ -174,7 +200,20 @@ export default function GlobeComponent() {
 
       if (intersects.length > 0) {
         const marker = intersects[0].object as THREE.Mesh;
-        label.textContent = marker.userData.name;
+        const userData = marker.userData;
+        
+        // Show label with city name and picture preview for blue dots
+        if (userData.hasPicture && userData.pictureUrl) {
+          label.innerHTML = `
+            <div>
+              <div style="margin-bottom: 5px; font-weight: bold;">${userData.name}</div>
+              <img src="${userData.pictureUrl}" alt="${userData.name}" style="width: 150px; height: 100px; object-fit: cover; border-radius: 3px;" onerror="this.style.display='none'"/>
+            </div>
+          `;
+        } else {
+          label.textContent = userData.name;
+        }
+        
         label.style.display = 'block';
         label.style.left = `${event.clientX - rect.left + 10}px`;
         label.style.top = `${event.clientY - rect.top + 10}px`;
@@ -187,9 +226,9 @@ export default function GlobeComponent() {
         label.style.display = 'none';
         isHoveringMarker = false;
 
-        // Reset color of all markers
+        // Reset color of all markers to their original colors
         markers.forEach(m => {
-          (m.material as THREE.MeshBasicMaterial).color.set(0xff0000);
+          (m.material as THREE.MeshBasicMaterial).color.set(m.userData.originalColor);
         });
       }
     }
@@ -210,7 +249,34 @@ export default function GlobeComponent() {
 
     // Add click handler
     function onClick(event: MouseEvent) {
-      // Do nothing on marker click
+      // Get mouse position relative to the container
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(markers);
+
+      if (intersects.length > 0) {
+        const marker = intersects[0].object as THREE.Mesh;
+        const userData = marker.userData;
+        
+        // Hide the hover tooltip immediately
+        label.style.display = 'none';
+        
+        // Reset all markers to original colors
+        markers.forEach(m => {
+          (m.material as THREE.MeshBasicMaterial).color.set(m.userData.originalColor);
+        });
+        
+        // Only open modal for locations with pictures
+        if (userData.hasPicture && userData.pictureUrl) {
+          setModalData({
+            name: userData.name,
+            pictureUrl: userData.pictureUrl
+          });
+        }
+      }
     }
 
     renderer.domElement.addEventListener('click', onClick);
@@ -281,14 +347,63 @@ export default function GlobeComponent() {
   }, []);
 
   return (
-    <div
-      ref={mountRef}
-      className="globe-container"
-      style={{
-        width: '100%',
-        height: '500px',
-        position: 'relative'
-      }}
-    />
+    <div className="w-full flex gap-6 items-start">
+      {/* Legend - left aligned at same level as globe */}
+      <div className="flex-shrink-0">
+        <h3 className="text-sm font-semibold mb-3 text-green-400">Legend</h3>
+        <div className="flex items-center mb-2">
+          <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+          <span className="text-xs text-green-400">Places without pictures</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+          <span className="text-xs text-green-400">Places with pictures</span>
+        </div>
+      </div>
+      
+      {/* Globe Container */}
+      <div className="flex-1 relative">
+        <div
+          ref={mountRef}
+          className="globe-container"
+          style={{
+            width: '100%',
+            height: '500px',
+            position: 'relative'
+          }}
+        />
+      </div>
+
+      {/* Picture Modal */}
+      {modalData && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={() => setModalData(null)}
+        >
+          <div 
+            className="bg-white rounded-lg p-4 max-w-2xl max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">{modalData.name}</h2>
+              <button 
+                onClick={() => setModalData(null)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <img 
+              src={modalData.pictureUrl} 
+              alt={modalData.name}
+              className="w-full h-auto max-h-[60vh] object-contain rounded"
+              onError={(e) => {
+                e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="%23f0f0f0"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999">Image not available</text></svg>';
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
