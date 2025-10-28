@@ -8,16 +8,22 @@ import type { Metadata } from 'next';
 export async function generateStaticParams() {
   const posts = await getAllPosts();
   console.log('Static params for posts:', posts.map(p => p.slug));
+  // Return empty array if no posts - Next.js will skip this route
+  if (posts.length === 0) {
+    return [];
+  }
   return posts.map((post) => ({
     slug: post.slug.split('/'),
   }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string[] } }) {
-  const { slug } = await Promise.resolve(params);
+export const dynamicParams = false; // Only allow pre-generated paths
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = await params;
   const fullSlug = slug.join('/');
   const post = await getPostBySlug(fullSlug);
-  
+
   if (!post) {
     return {
       title: 'Post Not Found',
@@ -30,8 +36,8 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   };
 }
 
-export default async function PostPage({ params }: { params: { slug: string[] } }) {
-  const { slug } = await Promise.resolve(params);
+export default async function PostPage({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = await params;
   const fullSlug = slug.join('/');
   const post = await getPostBySlug(fullSlug);
 

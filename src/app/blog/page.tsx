@@ -6,7 +6,7 @@ export default async function BlogPage() {
   
   // Get all unique tags and series
   const allTags = [...new Set(posts.flatMap(post => post.tags))].sort();
-  const allSeries = [...new Set(posts.map(post => post.series).filter(Boolean))].sort();
+  const allSeries = [...new Set(posts.map(post => post.series).filter((s): s is string => Boolean(s)))].sort();
 
   return (
     <div className="section">

@@ -3,21 +3,28 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface TagPageProps {
-  params: {
+  params: Promise<{
     tag: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
   const tags = await getAllTags();
+  // Return empty array if no tags - Next.js will skip this route
+  if (tags.length === 0) {
+    return [];
+  }
   return tags.map((tag) => ({
     tag: encodeURIComponent(tag),
   }));
 }
 
+export const dynamicParams = false; // Only allow pre-generated paths
+
 export async function generateMetadata({ params }: TagPageProps) {
-  const decodedTag = decodeURIComponent(params.tag);
-  
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
+
   return {
     title: `Posts tagged "${decodedTag}" - Zhu Han Wen Blog`,
     description: `All blog posts tagged with "${decodedTag}"`,
@@ -25,7 +32,8 @@ export async function generateMetadata({ params }: TagPageProps) {
 }
 
 export default async function TagPage({ params }: TagPageProps) {
-  const decodedTag = decodeURIComponent(params.tag);
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
   const posts = await getPostsByTag(decodedTag);
 
   if (posts.length === 0) {

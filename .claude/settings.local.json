@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(NEXT_LINT_IGNORE_BUILD_ERRORS=true npm run build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

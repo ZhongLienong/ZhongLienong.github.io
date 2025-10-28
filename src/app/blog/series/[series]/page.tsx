@@ -3,21 +3,28 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface SeriesPageProps {
-  params: {
+  params: Promise<{
     series: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
   const series = await getAllSeries();
+  // Return empty array if no series - Next.js will skip this route
+  if (series.length === 0) {
+    return [];
+  }
   return series.map((seriesName) => ({
     series: encodeURIComponent(seriesName),
   }));
 }
 
+export const dynamicParams = false; // Only allow pre-generated paths
+
 export async function generateMetadata({ params }: SeriesPageProps) {
-  const decodedSeries = decodeURIComponent(params.series);
-  
+  const { series } = await params;
+  const decodedSeries = decodeURIComponent(series);
+
   return {
     title: `${decodedSeries} Series - Zhu Han Wen Blog`,
     description: `All blog posts in the "${decodedSeries}" series`,
@@ -25,7 +32,8 @@ export async function generateMetadata({ params }: SeriesPageProps) {
 }
 
 export default async function SeriesPage({ params }: SeriesPageProps) {
-  const decodedSeries = decodeURIComponent(params.series);
+  const { series } = await params;
+  const decodedSeries = decodeURIComponent(series);
   const posts = await getPostsBySeries(decodedSeries);
 
   if (posts.length === 0) {
