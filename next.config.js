@@ -8,10 +8,7 @@ const nextConfig = {
   }
 }
 
-// Only add basePath and assetPrefix in production (GitHub Pages deployment)
-if (process.env.NODE_ENV === 'production') {
-  nextConfig.basePath = '/ZhongLienong.github.io'
-  nextConfig.assetPrefix = '/ZhongLienong.github.io/'
-}
+// Note: basePath and assetPrefix are NOT needed when using a custom domain
+// Custom domain (www.zhuhanwen.com) serves from root, not a subdirectory
 
 module.exports = nextConfig

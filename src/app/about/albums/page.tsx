@@ -6,9 +6,11 @@ import type { Album } from './types'
 import AlbumCard from './AlbumCard'
 import albumsData from './albums.json'
 
-const VISIBLE_ALBUMS = 4 // Number of albums to render at once (2 rows with 2 albums each)
-const ALBUM_HEIGHT = 450 // Approximate height of an album card in pixels
-const BUFFER_SIZE = 2 // Number of albums to buffer above and below the visible area
+const VISIBLE_ALBUMS = 8 // Number of albums to render at once (4 rows with 2 albums each)
+const ALBUM_HEIGHT = 400 // More accurate height estimate
+const BUFFER_SIZE = 1 // Reduced buffer for memory efficiency
+const ROTATION_INTERVAL = 8000 // 8 seconds between rotations (reduced frequency)
+const FADE_DURATION = 500 // 500ms fade duration
 
 export default function Albums() {
   const [filterTags, setFilterTags] = useState<string[]>([])
@@ -16,8 +18,13 @@ export default function Albums() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: VISIBLE_ALBUMS * 2 }) // Double buffer
+  const [fadingItems, setFadingItems] = useState<Set<string>>(new Set())
+  const [rotationIndex, setRotationIndex] = useState(0)
+  const [isRotating, setIsRotating] = useState(false)
+  const [hoveredAlbumId, setHoveredAlbumId] = useState<string | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const rotationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load albums only once on component mount
   useEffect(() => {
@@ -33,12 +40,45 @@ export default function Albums() {
         filterTags.every(tag => album.tags.includes(tag)));
   }, [albums, filterTags]);
 
-  // Determine if we should use virtualization
+  // Always use virtualization for memory efficiency
   const useVirtualization = useMemo(() => {
-    // Only use virtualization when there are more than 8 albums to display
-    // AND when filters are applied - show all albums when no filters are selected
-    return filterTags.length > 0 && filteredAlbums.length > 8;
-  }, [filteredAlbums.length, filterTags.length]);
+    return filteredAlbums.length > 8; // Virtualize when more than 8 albums
+  }, [filteredAlbums.length]);
+
+  // Create shuffled array for dynamic rotation - only shuffle when album IDs change
+  const shuffledAlbums = useMemo(() => {
+    if (filteredAlbums.length === 0) return [];
+
+    // Create a stable copy to avoid recreating on every render
+    const shuffled = [...filteredAlbums];
+
+    // Fisher-Yates shuffle - optimized to avoid creating temporary arrays
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = temp;
+    }
+    return shuffled;
+  }, [filteredAlbums.map(a => a.id).join(',')]);
+
+  // Get current visible albums with rotation
+  const currentVisibleAlbums = useMemo(() => {
+    if (!useVirtualization) return filteredAlbums;
+    
+    const totalAlbums = shuffledAlbums.length;
+    if (totalAlbums === 0) return [];
+    
+    const itemsToShow = Math.min(VISIBLE_ALBUMS, totalAlbums);
+    const rotatedAlbums = [];
+    
+    for (let i = 0; i < itemsToShow; i++) {
+      const index = (rotationIndex + i) % totalAlbums;
+      rotatedAlbums.push(shuffledAlbums[index]);
+    }
+    
+    return rotatedAlbums;
+  }, [shuffledAlbums, rotationIndex, useVirtualization, filteredAlbums]);
 
   // Debounced scroll handler to improve performance
   const handleScroll = useCallback(() => {
@@ -91,6 +131,45 @@ export default function Albums() {
     };
   }, [handleScroll]);
 
+  // Rotation effect for dynamic album display (paused when hovering)
+  useEffect(() => {
+    if (!useVirtualization || filteredAlbums.length <= VISIBLE_ALBUMS || hoveredAlbumId) {
+      // Clear any existing rotation when paused
+      if (rotationTimeoutRef.current) {
+        clearInterval(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+      return; // No rotation needed if all albums fit or user is hovering
+    }
+
+    // Use interval instead of nested timeouts to prevent memory leaks
+    const intervalId = setInterval(() => {
+      setIsRotating(true);
+      // Reuse fading items set instead of creating new one each time
+      setFadingItems(prev => {
+        const newSet = new Set<string>();
+        currentVisibleAlbums.forEach(album => newSet.add(album.id));
+        return newSet;
+      });
+
+      // Schedule fade completion and rotation
+      setTimeout(() => {
+        setRotationIndex(prev => (prev + 1) % shuffledAlbums.length);
+        setFadingItems(new Set()); // Clear set after fade
+        setIsRotating(false);
+      }, FADE_DURATION);
+    }, ROTATION_INTERVAL);
+
+    rotationTimeoutRef.current = intervalId;
+
+    return () => {
+      if (rotationTimeoutRef.current) {
+        clearInterval(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+    };
+  }, [useVirtualization, filteredAlbums.length, currentVisibleAlbums, shuffledAlbums.length, hoveredAlbumId]);
+
   // Recalculate visible range when filtered albums change
   useEffect(() => {
     handleScroll();
@@ -98,8 +177,16 @@ export default function Albums() {
 
   return (
     <div className="section">
+      <style jsx>{`
+        .album-grid-item:hover {
+          transform: translateY(-5px) !important;
+          box-shadow: 0 15px 35px rgba(106, 74, 140, 0.3), 0 5px 15px rgba(0,0,0,0.4) !important;
+          border: 1px solid rgba(106, 74, 140, 0.5) !important;
+        }
+      `}</style>
+      
       <h2 className="bg-purple">Now this is a CD wall</h2>
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '20px', position: 'relative' }}>
         {loading ? (
           <div>Loading albums...</div>
         ) : error ? (
@@ -121,24 +208,44 @@ export default function Albums() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
           gap: '20px',
           marginTop: '20px',
-          // When no filters are applied, remove the max height constraint to show all albums
-          // Otherwise, maintain the virtualized scrolling behavior
-          maxHeight: filterTags.length === 0 ? 'none' : '1100px',
+          maxHeight: '1100px', // Always constrain height for virtualization
           overflowY: 'auto',
           overflowX: 'hidden',
-          paddingRight: '16px', // Increased padding to accommodate scrollbar
-          // Standard scrollbar styling that works across browsers
+          paddingRight: '16px',
           scrollbarWidth: 'thin',
           scrollbarColor: '#6a4a8c #222',
-          // Force scrollbar to be visible with a minimum height when filters are applied
-          minHeight: filterTags.length === 0 ? 'auto' : '500px'
+          minHeight: '500px'
         }}>
           {useVirtualization
-            ? filteredAlbums.slice(visibleRange.start, visibleRange.end).map(album => (
-              <AlbumCard key={album.id} album={album} />
+            ? currentVisibleAlbums.map((album, index) => (
+              <div
+                key={album.id}
+                className="album-grid-item"
+                style={{
+                  opacity: fadingItems.has(album.id) ? 0 : 1,
+                  transform: fadingItems.has(album.id) ? 'scale(0.95)' : 'scale(1)',
+                  transition: `all ${FADE_DURATION}ms ease-in-out`,
+                }}
+                onMouseEnter={() => setHoveredAlbumId(album.id)}
+                onMouseLeave={() => setHoveredAlbumId(null)}
+              >
+                <AlbumCard album={album} loadDelay={index * 200} />
+              </div>
             ))
-            : filteredAlbums.map(album => (
-              <AlbumCard key={album.id} album={album} />
+            : filteredAlbums.map((album, index) => (
+              <div
+                key={album.id}
+                className="album-grid-item"
+                style={{
+                  opacity: 1,
+                  transform: 'scale(1)',
+                  transition: `all 0.3s ease-in-out`,
+                }}
+                onMouseEnter={() => setHoveredAlbumId(album.id)}
+                onMouseLeave={() => setHoveredAlbumId(null)}
+              >
+                <AlbumCard album={album} loadDelay={index * 200} />
+              </div>
             ))
           }
         </div>

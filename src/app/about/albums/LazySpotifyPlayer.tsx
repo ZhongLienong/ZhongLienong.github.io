@@ -2,33 +2,75 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-export default function LazySpotifyPlayer({ spotifyId }: { spotifyId: string }) {
+export default function LazySpotifyPlayer({
+  spotifyId,
+  loadDelay = 0
+}: {
+  spotifyId: string;
+  loadDelay?: number;
+}) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isTimedOut, setIsTimedOut] = useState(false);
+  const [canLoad, setCanLoad] = useState(false); // Add staggered loading control
   const containerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const loadDelayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Staggered loading: wait for loadDelay before allowing iframe to load
+  useEffect(() => {
+    // Only start the delay timer when visible
+    if (!isVisible) {
+      setCanLoad(false);
+      return;
+    }
+
+    if (loadDelay > 0) {
+      loadDelayTimeoutRef.current = setTimeout(() => {
+        setCanLoad(true);
+      }, loadDelay);
+    } else {
+      setCanLoad(true);
+    }
+
+    return () => {
+      if (loadDelayTimeoutRef.current) {
+        clearTimeout(loadDelayTimeoutRef.current);
+      }
+    };
+  }, [loadDelay, isVisible]);
 
   useEffect(() => {
     if (!containerRef.current) return;
-    
+
+    // Create observer only once
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect();
+        } else {
+          // Unload iframe when it goes out of view to save memory
+          setIsVisible(false);
+          setIsLoaded(false);
+          setHasError(false);
+          setIsTimedOut(false);
+          // canLoad is reset by the staggered loading effect
         }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        rootMargin: '100px' // Start loading 100px before entering viewport
+      }
     );
-    
+
     observer.observe(containerRef.current);
-    
+
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, []); // Empty deps - observer created only once
 
   // Set up timeout for iframe loading
   useEffect(() => {
@@ -72,12 +114,12 @@ export default function LazySpotifyPlayer({ spotifyId }: { spotifyId: string }) 
 
   return (
     <div ref={containerRef} style={{ height: isLoaded ? 'auto' : '352px' }}>
-      {isVisible && !hasError && !isTimedOut ? (
-        <iframe 
+      {isVisible && canLoad && !hasError && !isTimedOut ? (
+        <iframe
           src={`https://open.spotify.com/embed/album/${spotifyId}?utm_source=generator`}
-          width="100%" 
-          height="352" 
-          frameBorder="0" 
+          width="100%"
+          height="352"
+          frameBorder="0"
           allowFullScreen={true}
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"

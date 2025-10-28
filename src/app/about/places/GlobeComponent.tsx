@@ -381,14 +381,14 @@ export default function GlobeComponent() {
           onClick={() => setModalData(null)}
         >
           <div 
-            className="bg-white rounded-lg p-4 max-w-2xl max-h-[80vh] overflow-auto"
+            className="bg-gray-900 rounded-lg p-4 max-w-2xl max-h-[80vh] overflow-auto border border-green-400"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">{modalData.name}</h2>
+              <h2 className="text-xl font-bold text-green-400">{modalData.name}</h2>
               <button 
                 onClick={() => setModalData(null)}
-                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                className="text-green-400 hover:text-green-300 text-xl font-bold"
               >
                 ×
               </button>
