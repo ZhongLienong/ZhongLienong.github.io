@@ -1,0 +1,4 @@
+module Math
+public export { SquareRoot }
+
+foreign "SquareRoot" SquareRoot : fn(Float) -> Float;

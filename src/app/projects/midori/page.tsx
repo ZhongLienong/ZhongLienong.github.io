@@ -1,5 +1,3 @@
-'use client';
-
 export default function MidoriPage() {
   return (
     <div className="midori-page">

@@ -12,6 +12,16 @@ export default function ProjectsPage() {
       {/* Midori Project Card */}
       <div className="section">
         <h3 className="bg-teal">Midori(ミドリ) Programming Language</h3>
+        <div style={{ marginBottom: '10px' }}>
+          <a href="/playground" style={{
+            backgroundColor: '#000080',
+            color: '#FFFF00',
+            padding: '5px 15px',
+            fontWeight: 'bold',
+            textDecoration: 'none',
+            display: 'inline-block'
+          }}>Try Online →</a>
+        </div>
         <div>
           <p>
             A statically-typed programming language featuring algebraic data types,

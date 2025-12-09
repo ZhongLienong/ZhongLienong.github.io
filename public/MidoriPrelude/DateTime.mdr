@@ -1,0 +1,4 @@
+module DateTime
+public export { GetTime }
+
+foreign "GetTime" GetTime : fn() -> Float;

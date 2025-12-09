@@ -1,0 +1,10 @@
+module IO
+public export { Print, OverwriteToFile, AppendToFile, PrintLine }
+
+foreign "Print" Print : fn(Text) -> Unit;
+
+foreign "OverwriteToFile" OverwriteToFile : fn(Text, Text) -> Bool;
+
+foreign "AppendToFile" AppendToFile : fn(Text, Text) -> Bool;
+
+defun PrintLine(text: Text) : Unit => { Print(text ++ "\n"); };
