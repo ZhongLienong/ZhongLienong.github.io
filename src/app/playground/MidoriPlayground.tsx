@@ -504,23 +504,39 @@ IO::PrintLine("Fibonacci(10) = " ++ (result as Text));
 					</button>
 					<button className="example-btn" onClick={() => loadExample(`import { "/MidoriPrelude/IO.mdr" }
 
-union Option<T> = Some(T) | None;
+union Expr = Num(Float)
+    | Add(Expr, Expr)
+    | Sub(Expr, Expr)
+    | Mul(Expr, Expr)
+    | Div(Expr, Expr);
 
-defun unwrap<T>(opt: Option<T>, default_val: T) : T => {
-    return match opt with
-        case Option::Some(value) => value
-        case Option::None => default_val
-        default => default_val
-    ;
-};
+defun eval(expr : Expr) : Float =>
+    match expr with
+        case Expr::Num(value) => value
+        case Expr::Add(left, right) => eval(left) + eval(right)
+        case Expr::Sub(left, right) => eval(left) - eval(right)
+        case Expr::Mul(left, right) => eval(left) * eval(right)
+        case Expr::Div(left, right) => 
+        {
+            def denominator = eval(right);
+            if denominator == 0.0 then
+            {
+                // handle division by zero gracefully
+                IO::PrintLine("Error: Division by zero");
+                0.0
+            }
+            else
+                eval(left) / denominator
+        }
+;
 
-def some_value = new Option::Some(42);
-def none_value = new Option::None<Int>();
+def expr = new Expr::Mul
+(
+    new Expr::Add(new Expr::Num(3.0), new Expr::Num(5.0)),
+    new Expr::Sub(new Expr::Num(10.0), new Expr::Num(2.0))
+);
 
-IO::PrintLine("Some: ");
-IO::PrintLine(unwrap(some_value, 0) as Text);
-IO::PrintLine("None: ");
-IO::PrintLine(unwrap(none_value, 99) as Text);
+IO::PrintLine("Expected 64.0, expression evaluation result: " ++ (eval(expr) as Text));
 `)}>
 						Pattern Matching
 					</button>
