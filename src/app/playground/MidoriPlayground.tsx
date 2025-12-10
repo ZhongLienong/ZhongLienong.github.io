@@ -307,7 +307,7 @@ export default function MidoriPlayground() {
 					overflow: hidden;
 				}
 
-				.code-editor {
+				.midori-code-editor {
 					flex: 1;
 					background: #1e1e1e;
 					color: #d4d4d4;
@@ -319,20 +319,21 @@ export default function MidoriPlayground() {
 					resize: none;
 					outline: none;
 					overflow-y: auto;
+					max-width: none;
 				}
 
-				.code-editor::-webkit-scrollbar {
+				.midori-code-editor::-webkit-scrollbar {
 					width: 14px;
 					height: 14px;
 				}
 
-				.code-editor::-webkit-scrollbar-thumb {
+				.midori-code-editor::-webkit-scrollbar-thumb {
 					background: #424242;
 					border: 3px solid #1e1e1e;
 					border-radius: 7px;
 				}
 
-				.code-editor::-webkit-scrollbar-thumb:hover {
+				.midori-code-editor::-webkit-scrollbar-thumb:hover {
 					background: #4e4e4e;
 				}
 
@@ -464,7 +465,7 @@ export default function MidoriPlayground() {
 						</div>
 						<textarea
 							ref={editorRef}
-							className="code-editor"
+							className="midori-code-editor"
 							value={code}
 							onChange={(e) => setCode(e.target.value)}
 							onKeyDown={handleKeyDown}
