@@ -23,6 +23,7 @@ export const locations: Location[] = [
     { name: 'Jackson', lat: 32.3, lng: -90.2 },
     { name: 'Memphis', lat: 35.1, lng: -90.1 },
     { name: 'New Orleans', lat: 30.0, lng: -90.1, hasPicture: true, pictureUrl: 'https://picsum.photos/400/300?random=6' },
+    { name: 'New York City', lat: 40.730610, lng: -73.935242 },
     { name: 'London', lat: 51.5, lng: -0.13, hasPicture: true, pictureUrl: 'https://picsum.photos/400/300?random=7' },
     { name: 'Cambridge', lat: 52.2, lng: -0.13 },
     { name: 'Liverpool', lat: 53.4, lng: -2.99 },
