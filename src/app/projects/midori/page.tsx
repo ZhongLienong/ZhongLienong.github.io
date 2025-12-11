@@ -235,7 +235,7 @@ export default function MidoriPage() {
         <p className="midori-subtitle">A Programming Language</p>
         <p className="midori-tagline">
           Statically-typed programming language featuring algebraic data types, pattern matching,
-          typeclasses, and a powerful module system. Compiles to bytecode for the Midori Virtual Machine
+          classes, and a powerful module system. Compiles to bytecode for the Midori Virtual Machine
           with garbage-collected memory management.
         </p>
       </div>
@@ -244,7 +244,7 @@ export default function MidoriPage() {
         <span className="tech-badge">Static Typing</span>
         <span className="tech-badge">Functional</span>
         <span className="tech-badge">Pattern Matching</span>
-        <span className="tech-badge">Typeclasses</span>
+        <span className="tech-badge">Classes</span>
         <span className="tech-badge">Bytecode VM</span>
         <span className="tech-badge">Garbage Collection</span>
       </div>
@@ -277,7 +277,7 @@ export default function MidoriPage() {
         </div>
 
         <div className="feature-card">
-          <h3 className="feature-title">Typeclasses</h3>
+          <h3 className="feature-title">Classes</h3>
           <p className="feature-desc">
             Constrained generics for powerful polymorphism. Define behavior
             contracts and implement them for any type.
@@ -362,17 +362,17 @@ defun handle_result<T>(result: Result<T, Text>) : Text => {
 };`}</pre>
       </div>
 
-      <h2 className="section-header">Typeclasses</h2>
+      <h2 className="section-header">Classes</h2>
 
       <div className="highlight-box">
-        <strong>Typeclasses</strong> allow you to define behavior
+        <strong>Classes</strong> allow you to define behavior
         that can be implemented for multiple types while maintaining type safety.
       </div>
 
       <div className="code-example">
-        <div className="code-label">Typeclass Definition and Implementation</div>
-        <pre>{`// Define a typeclass
-typeclass Show<T> {
+        <div className="code-label">Class Definition and Implementation</div>
+        <pre>{`// Define a Class
+class Show<T> {
     show: fn(value: T) -> Text;
 };
 
@@ -494,7 +494,7 @@ defun map<A, B>(list: List<A>, f: fn(A) -> B) : List<B> => {
         <p><strong>Composite Types:</strong> Array&lt;T&gt;, structs, unions</p>
         <p><strong>Function Types:</strong> fn(T1, T2) -&gt; R</p>
         <p><strong>Generic Parameters:</strong> Single and multiple type parameters</p>
-        <p><strong>Type Constraints:</strong> Typeclass constraints with where clause</p>
+        <p><strong>Type Constraints:</strong> Class constraints with where clause</p>
         <p><strong>Type Inference:</strong> Automatic type deduction at instantiation</p>
       </div>
 

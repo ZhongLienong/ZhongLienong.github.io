@@ -25,7 +25,7 @@ export default function ProjectsPage() {
         <div>
           <p>
             A statically-typed programming language featuring algebraic data types,
-            pattern matching, typeclasses, and a module system. Compiles to bytecode for the
+            pattern matching, classes, and a module system. Compiles to bytecode for the
             Midori Virtual Machine with garbage-collected memory management.
           </p>
           <p>
@@ -38,7 +38,7 @@ export default function ProjectsPage() {
           }}>
             <li>✓ Static Type System with Type Inference</li>
             <li>✓ Pattern Matching & Algebraic Data Types</li>
-            <li>✓ Typeclasses</li>
+            <li>✓ Classes</li>
             <li>✓ Module System & Closures</li>
             <li>✓ Pipe Operator & Functional Composition</li>
           </ul>
