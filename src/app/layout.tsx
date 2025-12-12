@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import VisitorCounter from "@/components/VisitorCounter";
 
 export const metadata: Metadata = {
   title: "Zhu Han Wen - Personal Website",
@@ -18,13 +19,6 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossOrigin="anonymous"/>
       </head>
       <body>
-        {/* Hit Counter */}
-        <div className="hit-counter">
-          <div className="counter-display">
-            Visitors: 000001
-          </div>
-        </div>
-
         {/* Under Construction Banner */}
         <div className="construction-banner blink">
           🚧 UNDER CONSTRUCTION 🚧
@@ -69,6 +63,7 @@ export default function RootLayout({
           <div className="copyright">
             © {new Date().getFullYear()} - Last updated: {new Date().toLocaleDateString()}
           </div>
+          <VisitorCounter />
         </footer>
       </body>
     </html>
