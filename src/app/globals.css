@@ -423,27 +423,11 @@ pre {
   font-weight: bold;
 }
 
-/* Hit Counter */
-.hit-counter {
-  background-color: #000000;
-  color: #00FF00;
-  padding: 5px;
-  text-align: center;
-  border: 2px solid #00FF00;
-  margin: 10px auto;
-  width: 200px;
-}
-
-.hit-counter img {
-  display: block;
-  margin: 0 auto;
-}
-
 /* Construction Banner */
-.construction-banner {
-  background-color: #FF0000;
-  color: #FFFFFF;
-  text-align: center;
+  .construction-banner {
+    background-color: #FF0000;
+    color: #FFFFFF;
+    text-align: center;
   padding: 10px;
   font-weight: bold;
   border: 3px dashed #FFFF00;
@@ -500,49 +484,9 @@ pre {
 }
 
 /* Counter Display */
-.counter-display {
-  border: 2px solid #00FF00;
-  padding: 5px;
-  background: #000080;
-  color: #FFFF00;
-  text-align: center;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.counter-label {
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.counter-embed {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 0;
-  background: transparent;
-  border: none;
-}
-
-.counter-credit {
-  font-size: 12px;
-}
-
-.counter-credit a {
-  border: none;
-  background: none;
-  padding: 0;
-  color: #FFFF00;
-  text-decoration: underline;
-}
-
-/* Best Viewed Badge */
-.best-viewed-badge {
-  border: 2px solid #00FF00;
+  /* Best Viewed Badge */
+  .best-viewed-badge {
+    border: 2px solid #00FF00;
   padding: 5px;
   background: #000080;
   color: #FFFF00;

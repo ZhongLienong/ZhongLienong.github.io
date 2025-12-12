@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import VisitorCounter from "@/components/VisitorCounter";
 
 export const metadata: Metadata = {
   title: "Zhu Han Wen - Personal Website",
@@ -63,7 +62,6 @@ export default function RootLayout({
           <div className="copyright">
             © {new Date().getFullYear()} - Last updated: {new Date().toLocaleDateString()}
           </div>
-          <VisitorCounter />
         </footer>
       </body>
     </html>
